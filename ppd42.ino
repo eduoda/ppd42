@@ -31,6 +31,7 @@ void P25Change(){
     p25Time = ms;
   }
 }
+
 void P10Change(){
   unsigned long ms = micros();
   if(digitalRead(P10)==HIGH){
