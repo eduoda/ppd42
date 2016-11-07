@@ -27,7 +27,7 @@ void P25Change(){
   if(digitalRead(P25)==HIGH){
     p25Duration = ms - p25Time;
     p25LowLength += p25Duration;
-  }else{ // falling
+  }else{
     p25Time = ms;
   }
 }
@@ -36,20 +36,21 @@ void P10Change(){
   if(digitalRead(P10)==HIGH){
     p10Duration = ms - p10Time;
     p10LowLength += p10Duration;
-  }else{ // falling
+  }else{
     p10Time = ms;
   }
 }
 
 void loop() {
-  if ((millis()-sampleTime) > SAMPLELENGTH){    
+  unsigned long sampleLength = millis()-sampleTime;
+  if (sampleLength > SAMPLELENGTH){    
     Serial.print("P25 concentration: ");
-    Serial.print(calcConcentration(p25LowLength));
+    Serial.print(calcConcentration(sampleLength,p25LowLength));
     Serial.println(" pcs/0.01cf");
     p25LowLength = 0;
 
     Serial.print("P10 concentration: ");
-    Serial.print(calcConcentration(p10LowLength));
+    Serial.print(calcConcentration(sampleLength,p10LowLength));
     Serial.println(" pcs/0.01cf");
     p10LowLength = 0;
 
@@ -58,7 +59,7 @@ void loop() {
 }
 
 // untested blackmagic from spec
-float calcConcentration(unsigned long lowLength){
-  float ratio = lowLength/(SAMPLELENGTH*10.0);
+float calcConcentration(unsigned long sampleLength, unsigned long lowLength){
+  float ratio = lowLength/(sampleLength*10.0);
   return 1.1*pow(ratio,3)-3.8*pow(ratio,2)+520*ratio+0.62;
 }
